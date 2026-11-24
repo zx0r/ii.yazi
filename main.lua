@@ -4,6 +4,7 @@
 local M = {}
 
 local emit = ya.mgr_emit or ya.emit or ya.manager_emit
+local tty_path = (ya.target_family and ya.target_family() == "windows") and "CONOUT$" or "/dev/tty"
 
 local function current(url, skip)
   local tab = cx.active
@@ -43,7 +44,7 @@ local publish_graphics = ya.sync(function(state, tab, request, url, skip, geomet
   for _, upload in ipairs(packets) do
     local packet, key = upload[1], upload[2]
     if not (reuse and page.sent[key]) then
-      tty = tty or io.open("/dev/tty", "wb") or io.stdout
+      tty = tty or io.open(tty_path, "wb") or io.stdout
       if not tty:write(packet) then
         if tty ~= io.stdout then tty:close() end
         return false
@@ -66,6 +67,19 @@ local publish_graphics = ya.sync(function(state, tab, request, url, skip, geomet
     sent = sent,
   }
   return true
+end)
+
+local calc_seek = ya.sync(function(state, tab, url, skip, units)
+  local pending = state.pending_seek
+  local base = pending and pending.tab == tab and pending.url == url and pending.target or skip
+  local target = math.max(0, base + units)
+  local page = state.page
+  if page and page.tab == tab and page.url == url and page.skip == skip and page.eof then
+    target = math.min(target, page.last)
+  end
+  if target == base then return nil end
+  state.pending_seek = { tab = tab, url = url, target = target }
+  return target
 end)
 
 -- Each replayable upload includes all continuations and its virtual placement.
@@ -106,7 +120,7 @@ function M:peek(job)
   local geometry = table.concat({w, h, cell_size_arg or "default", theme_arg}, "/")
   local function fail(message)
     if publish_graphics(tab, request, url, skip, geometry, h, 0, false) then
-      ya.preview_widget(job, ui.Text("ii: " .. message):area(job.area))
+      ya.preview_widget(job, ui.Text("ii: " .. message):area(job.area):wrap(ui.Wrap.NO))
     end
   end
 
@@ -150,7 +164,7 @@ function M:peek(job)
     rows = rows + 1
   end
   if not publish_graphics(tab, request, url, skip, geometry, h, rows, uploads(raw:sub(5,4+n))) then return end
-  ya.preview_widget(job, ui.Text.parse(text):area(job.area))
+  ya.preview_widget(job, ui.Text.parse(text):area(job.area):wrap(ui.Wrap.NO))
 end
 
 function M:seek(job)
@@ -159,16 +173,11 @@ function M:seek(job)
   if not hovered or hovered.url ~= job.file.url then return end
   local tab, url = cx.tabs.idx, tostring(job.file.url)
   local skip = tonumber(active.preview.skip) or 0
-  local pending = self.pending_seek
-  local base = pending and pending.tab == tab and pending.url == url and pending.target or skip
-  local target = math.max(0, base + (tonumber(job.units) or 0))
-  local page = self.page
-  if page and page.tab == tab and page.url == url and page.skip == skip and page.eof then
-    target = math.min(target, page.last)
+  local units = tonumber(job.units) or 0
+  local target = calc_seek(tab, url, skip, units)
+  if target then
+    emit("peek", { target, only_if = job.file.url })
   end
-  if target == base then return end
-  self.pending_seek = { tab = tab, url = url, target = target }
-  emit("peek", { target, only_if = job.file.url })
 end
 
 function M:preload(_) return true end

@@ -1,0 +1,11 @@
+[package]
+id = "ii"
+name = "ii.yazi"
+version = "0.1.0"
+description = "Terminal graphical coprocessor preview adapter for Yazi"
+authors = ["zx0r <contact@zx0r.io>"]
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/zx0r/ii"
+
+[plugin]
+type = "previewer"
