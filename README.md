@@ -10,6 +10,14 @@
   <img src="assets/images/fmt.webp" alt="ii formats preview" style="border-radius: 8px; max-width: 100%;" />
 </p>
 
+<p align="center">
+  <img src="assets/images/nvim.webp" alt="ii Neovim preview" style="border-radius: 8px; max-width: 100%;" />
+</p>
+
+<p align="center">
+  <img src="assets/images/tmux.webp" alt="ii tmux preview" style="border-radius: 8px; max-width: 100%;" />
+</p>
+
 Terminal graphical coprocessor preview adapter for [Yazi](https://github.com/sxyazi/yazi). Renders Markdown, LaTeX formulas, Mermaid diagrams, Vega/Plotly charts, SVGs, and Jupyter Notebooks inline using the Kitty Graphics Protocol (KGP) and Sixel.
 
 Requires [ii](https://github.com/zx0r/ii#installation) on `PATH` and a terminal emulator supporting Kitty Graphics Protocol (Kitty, Ghostty, WezTerm).
