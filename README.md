@@ -12,7 +12,6 @@ Requires [ii](https://github.com/zx0r/ii#installation) on `PATH` and a terminal 
 - **Thread-Safe Graphics Sync**: Atomic state synchronisation via `ya.sync` eliminates race conditions and scrolling stutter during fast pagination (`J` / `K`).
 - **Terminal Grid Safety**: Enforces `ui.Wrap.NO` to prevent line-wrapping artifacts in tabular data and ASCII diagrams.
 - **Multiplexer Pass-Through**: Automatically wraps Kitty escape codes in tmux DCS sequences (`\027Ptmux;...`).
-- **Cross-Platform TTY**: Automatic fallback between POSIX `/dev/tty` and Windows `CONOUT$`.
 
 ---
 
@@ -40,7 +39,7 @@ Add the preloader and previewer rules to `~/.config/yazi/yazi.toml`:
 [plugin]
 # Background preloader: caches rendered frames before cursor navigation
 prepend_preloaders = [
-  { url = "*.{md,markdown,mdx,qmd,rmd,ipynb,mmd,mermaid,dot,gv,svg,svgz,ttf,otf,ttc,tex,latex,typ,csv,tsv,vl,vega,plotly}", run = "ii" },
+  { url = "*.{md,markdown,mdx,qmd,rmd,ipynb,mmd,mermaid,dot,gv,svg,svgz,tex,latex,typ,typst,chem,mhchem,html,htm,csv,tsv,vl,vega,vega-lite,plotly,zip,jar,whl,tar,tgz,tbz2,txz,tzst}", run = "ii" },
 ]
 
 # Tier 0 previewers: high-priority graphic coprocessor
@@ -48,18 +47,17 @@ prepend_previewers = [
   # Documents & scientific publications
   { url = "*.{md,markdown,mdx,qmd,rmd}", run = "ii" },
   { url = "*.ipynb",                     run = "ii" },
-  { url = "*.{tex,latex,typ}",           run = "ii" },
+  { url = "*.{tex,latex,typ,typst}",     run = "ii" },
 
   # Vector diagrams, charts & layouts
   { url = "*.{mmd,mermaid,dot,gv,svg,svgz,vl,vega,vega-lite,plotly,chem,mhchem,html,htm}", run = "ii" },
 
-  # Tabular datasets & typography
+  # Tabular datasets
   { url = "*.{csv,tsv}",                 run = "ii" },
-  { url = "*.{ttf,otf,ttc}",             run = "ii" },
 
   # Binary archive inspection
-  { mime = "application/{*zip,tar,bzip2,7z*,rar,xz,zstd,java-archive}", run = "ii" },
-  { url = "*.{zip,tar,gz,tgz,bz2,tbz2,xz,txz,zst,tzst,7z,rar,iso,dmg,pkg,deb,rpm,whl,jar}", run = "ii" },
+  { mime = "application/{*zip,tar,x-tar,gzip,x-bzip2,x-xz,zstd,java-archive}", run = "ii" },
+  { url = "*.{zip,jar,whl,tar,tgz,tbz2,txz,tzst}", run = "ii" },
 ]
 ```
 
